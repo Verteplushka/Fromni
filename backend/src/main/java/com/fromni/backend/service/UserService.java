@@ -1,9 +1,9 @@
 package com.fromni.backend.service;
 
-import com.fromni.backend.dto.UserDto;
+import com.fromni.backend.entity.User;
 
 public interface UserService {
-    public boolean checkUser(UserDto userDto);
-    public boolean addUser(UserDto userDto);
+    public boolean checkUser(User user);
+    public boolean addUser(User user);
 
 }

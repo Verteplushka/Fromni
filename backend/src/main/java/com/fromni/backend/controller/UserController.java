@@ -1,6 +1,6 @@
 package com.fromni.backend.controller;
 
-import com.fromni.backend.dto.UserDto;
+import com.fromni.backend.entity.User;
 import com.fromni.backend.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,14 +15,14 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/addUser")
-    public ResponseEntity<Boolean> addUser(@RequestBody UserDto userDto) {
-        Boolean savedUser = userService.addUser(userDto);
+    public ResponseEntity<Boolean> addUser(@RequestBody User user) {
+        Boolean savedUser = userService.addUser(user);
         return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
     }
 
     @GetMapping("/checkUser")
-    public ResponseEntity<Boolean> checkUser(@RequestBody UserDto userDto) {
-        Boolean checkedUser = userService.checkUser(userDto);
+    public ResponseEntity<Boolean> checkUser(@RequestBody User user) {
+        Boolean checkedUser = userService.checkUser(user);
         return new ResponseEntity<>(checkedUser, HttpStatus.ACCEPTED);
     }
 }
