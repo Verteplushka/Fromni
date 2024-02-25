@@ -16,7 +16,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -38,6 +37,15 @@ public class MessageServiceImpl implements MessageService {
         Message savedMessage = messageRepository.save(message);
         saveButtons(messageDto.getButtons(), message.getId());
         return savedMessage;
+    }
+
+    @Override
+    public List<Message> getMessageByUserAndChannel(User user, String channelName) {
+        User foundUser = findAndCheckuser(user);
+        if(foundUser == null) return null;
+        Channel foundChannel = findChannel(channelName);
+
+        return messageRepository.findAllByUserIdAndChannelId(foundUser.getId(), foundChannel.getId()).orElse(null);
     }
 
     private User findAndCheckuser(User user) {
