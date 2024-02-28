@@ -2,7 +2,6 @@ package com.fromni.backend.controller;
 
 import com.fromni.backend.dto.MessageDto;
 import com.fromni.backend.dto.WrapperDto;
-import com.fromni.backend.entity.Channel;
 import com.fromni.backend.entity.Message;
 import com.fromni.backend.entity.User;
 import com.fromni.backend.service.MessageService;
@@ -21,14 +20,20 @@ public class MessageController {
     private MessageService messageService;
 
     @PostMapping("/createMessage")
-    public ResponseEntity<Message> createMessage(@RequestBody MessageDto messageDto){
-        Message savedMessage = messageService.createMessage(messageDto);
+    public ResponseEntity<MessageDto> createMessage(@RequestBody MessageDto messageDto){
+        MessageDto savedMessage = messageService.createMessage(messageDto);
         return new ResponseEntity<>(savedMessage, HttpStatus.CREATED);
     }
 
-    @GetMapping("/getMessage")
-    public ResponseEntity<List<Message>> getMessage(@RequestBody WrapperDto wrapperDto){
-        List<Message> foundMessages = messageService.getMessageByUserAndChannel(wrapperDto.getUser(), wrapperDto.getChannel().getName());
+    @GetMapping("/getMessages")
+    public ResponseEntity<List<MessageDto>> getMessages(@RequestBody User user){
+        List<MessageDto> foundMessages = messageService.getMessagesByUser(user);
         return ResponseEntity.ok(foundMessages);
+    }
+
+    @PostMapping("/updateMessage")
+    public ResponseEntity<MessageDto> updateMessage(@RequestBody MessageDto messageDto){
+        MessageDto updatedMessage = messageService.updateMessage(messageDto);
+        return ResponseEntity.ok(updatedMessage);
     }
 }

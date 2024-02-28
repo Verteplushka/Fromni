@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface MessageRepository extends JpaRepository<Message, Long> {
-    Optional<List<Message>> findAllByUserIdAndChannelId(Long userId, Long channelId);
+    Optional<Message> findByUserIdAndChannelId(Long userId, Long channelId);
+    Optional<List<Message>> findByUserId(Long userId);
 
 }

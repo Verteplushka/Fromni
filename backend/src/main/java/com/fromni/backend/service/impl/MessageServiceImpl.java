@@ -15,6 +15,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -27,25 +28,56 @@ public class MessageServiceImpl implements MessageService {
     private PasswordEncoder passwordEncoder;
 
     @Override
-    public Message createMessage(MessageDto messageDto) {
+    public MessageDto createMessage(MessageDto messageDto) {
         User foundUser = findAndCheckuser(messageDto.getUser());
         if(foundUser == null){
             return null;
         }
-        Channel foundChannel = findChannel(messageDto.getChannelName());
+        Channel foundChannel = findChannelByName(messageDto.getChannelName());
         Message message = new Message(foundUser.getId(), foundChannel.getId(), messageDto.getMessage());
-        Message savedMessage = messageRepository.save(message);
+        messageRepository.save(message);
         saveButtons(messageDto.getButtons(), message.getId());
-        return savedMessage;
+        return messageDto;
     }
 
     @Override
-    public List<Message> getMessageByUserAndChannel(User user, String channelName) {
+    public List<MessageDto> getMessagesByUser(User user) {
         User foundUser = findAndCheckuser(user);
         if(foundUser == null) return null;
-        Channel foundChannel = findChannel(channelName);
 
-        return messageRepository.findAllByUserIdAndChannelId(foundUser.getId(), foundChannel.getId()).orElse(null);
+        List<Message> messages = messageRepository.findByUserId(foundUser.getId()).orElse(null);
+        List<MessageDto> messagesDto = new ArrayList<>();
+        MessageDto newMessage;
+        if(messages != null){
+            for(int i = 0; i < messages.size(); i++){
+                newMessage = new MessageDto(user, findChannelById(messages.get(i).getChannelId()).getName(), messages.get(i).getMessageText(), findButtonsByMessageId(messages.get(i).getId()));
+                messagesDto.add(newMessage);
+            }
+        }
+
+        return messagesDto;
+    }
+
+    @Override
+    public MessageDto updateMessage(MessageDto messageDto){
+        Message message = getMessageByUserAndChannel(messageDto.getUser(), messageDto.getChannelName());
+        if(message != null){
+            messageRepository.delete(message);
+        }
+
+        return createMessage(messageDto);
+    }
+
+    private List<Button> findButtonsByMessageId(Long messageId){
+        return buttonRepository.findAllByMessageId(messageId).orElse(null);
+    }
+
+    private Message getMessageByUserAndChannel(User user, String channelName) {
+        User foundUser = findAndCheckuser(user);
+        if(foundUser == null) return null;
+        Channel foundChannel = findChannelByName(channelName);
+
+        return messageRepository.findByUserIdAndChannelId(foundUser.getId(), foundChannel.getId()).orElse(null);
     }
 
     private User findAndCheckuser(User user) {
@@ -58,9 +90,15 @@ public class MessageServiceImpl implements MessageService {
         return null;
     }
 
-    private Channel findChannel(String channelName){
+    private Channel findChannelByName(String channelName){
         return channelRepository.findByName(channelName).orElse(null);
     }
+
+    private Channel findChannelById(Long id){
+        return channelRepository.findById(id).orElse(null);
+    }
+
+
 
     private void saveButtons(List<Button> buttons, Long id){
         for(Button button : buttons){

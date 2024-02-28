@@ -8,6 +8,7 @@ import com.fromni.backend.entity.User;
 import java.util.List;
 
 public interface MessageService {
-    Message createMessage(MessageDto messageDto);
-    List<Message> getMessageByUserAndChannel(User user, String channelName);
+    MessageDto createMessage(MessageDto messageDto);
+    List<MessageDto> getMessagesByUser(User user);
+    MessageDto updateMessage(MessageDto messageDto);
 }
